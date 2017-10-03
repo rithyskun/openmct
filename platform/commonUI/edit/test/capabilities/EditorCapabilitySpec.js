@@ -62,9 +62,7 @@ define(
                 );
                 mockTransactionService.commit.andReturn(fastPromise());
                 mockTransactionService.cancel.andReturn(fastPromise());
-                mockTransactionService.isActive = function () {
-                    return true;
-                };
+                mockTransactionService.isActive = jasmine.createSpy('isActive');
 
                 mockStatusCapability = jasmine.createSpyObj(
                     "statusCapability",
@@ -144,6 +142,7 @@ define(
 
             describe("finish", function () {
                 beforeEach(function () {
+                    mockTransactionService.isActive.andReturn(true);
                     capability.edit();
                     capability.finish();
                 });
@@ -157,15 +156,17 @@ define(
 
             describe("finish", function () {
                 beforeEach(function () {
-                    mockTransactionService.isActive = function () {
-                        return false;
-                    };
+                    mockTransactionService.isActive.andReturn(false);
                     capability.edit();
-                    capability.finish();
                 });
 
                 it("does not cancel transaction when transaction is not active", function () {
+                    capability.finish();
                     expect(mockTransactionService.cancel).not.toHaveBeenCalled();
+                });
+
+                it("returns a promise", function () {
+                    expect(capability.finish() instanceof Promise).toBe(true);
                 });
             });
 
