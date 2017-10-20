@@ -28,8 +28,7 @@ define([], function () {
      * @memberof module:openmct
      */
     function ViewRegistry() {
-        this._next_id = 0;
-        this.providers = [];
+        this.providers = {};
     }
 
 
@@ -40,10 +39,18 @@ define([], function () {
      *          which can provide views of this object
      */
     ViewRegistry.prototype.get = function (item) {
-        return this.providers.filter(function (provider) {
-            return provider.canView(item);
-        });
+        return this.getAllProviders()
+            .filter(function (provider) {
+                return provider.canView(item);
+            });
     };
+
+    /**
+     * @private
+     */
+    ViewRegistry.prototype.getAllProviders = function () {
+        return Object.values(this.providers);
+    }
 
     /**
      * Register a new type of view.
@@ -53,19 +60,23 @@ define([], function () {
      * @memberof module:openmct.ViewRegistry#
      */
     ViewRegistry.prototype.addProvider = function (provider) {
-        provider._vpid = this._next_id++;
-        this.providers.push(provider);
+        var key = provider.key;
+        if (key === undefined) {
+            throw "View providers must have a unique 'key' defined";
+        }
+        if (providers[key] !== undefined) {
+            throw "Provider already defined for key '" + key + "'. Keys must be unique.";
+        }
+
+        this.providers[key] = provider;
     };
 
     /**
-     * Used internally to support seamless usage of new views with old
-     * views.
+     * Return 
      * @private
      */
-    ViewRegistry.prototype._getByVPID = function (vpid) {
-        return this.providers.filter(function (p) {
-            return p._vpid === vpid;
-        })[0]
+    ViewRegistry.prototype.getByProviderKey = function (key) {
+        return this.providers[key];
     };
 
     /**
@@ -104,6 +115,7 @@ define([], function () {
      * Exposes types of views in Open MCT.
      *
      * @interface ViewProvider
+     * @property {string} key a unique identifier for this view
      * @property {string} name the human-readable name of this view
      * @property {string} [description] a longer-form description (typically
      *           a single sentence or short paragraph) of this kind of view

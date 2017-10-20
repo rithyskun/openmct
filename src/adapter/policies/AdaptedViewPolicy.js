@@ -29,7 +29,7 @@ define([], function () {
         view,
         legacyObject
     ) {
-        if (view.hasOwnProperty('vpid')) {
+        if (view.hasOwnProperty('providerKey')) {
             var domainObject = legacyObject.useCapability('adapter');
             return view.provider.canView(domainObject);
         }

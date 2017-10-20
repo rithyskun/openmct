@@ -27,7 +27,7 @@ define([
         return {
             restrict: 'E',
             link: function (scope, element, attrs) {
-                var provider = openmct.objectViews._getByVPID(Number(attrs.mctVpid));
+                var provider = openmct.objectViews.getByViewKey(attrs.mctProviderKey);
                 var view = new provider.view(scope.domainObject.useCapability('adapter'));
                 view.show(element[0]);
                 if (view.destroy) {
