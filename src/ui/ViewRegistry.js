@@ -41,8 +41,7 @@ define([], function () {
      */
     ViewRegistry.prototype.get = function (item) {
         return this.providers.filter(function (provider) {
-            return typeof provider.canView(item) !== 'undefined' &&
-                provider.canView(item) !== false;
+            return provider.canView(item);
         });
     };
 
@@ -119,16 +118,26 @@ define([], function () {
      * When called by Open MCT, this may include additional arguments
      * which are on the path to the object to be viewed; for instance,
      * when viewing "A Folder" within "My Items", this method will be
-     * invoked with "A Folder" (as a domain object) as the first argument,
-     * and "My Items" as the second argument.
+     * invoked with "A Folder" (as a domain object) as the first argument
      *
      * @method canView
      * @memberof module:openmct.ViewProvider#
      * @param {module:openmct.DomainObject} domainObject the domain object
      *        to be viewed
-     * @returns {Number|boolean} if this returns `false`, then the view does
-     *          not apply to the object.  If it returns true or any number, then
-     *          it applies to this object.  If multiple views could apply
+     * @returns {boolean} 'true' if the view applies to the provided object, 
+     *          otherwise 'false'.
+     */
+
+    /**
+     * Optional method determining the priority of a given view. If this 
+     * function is not defined on a view provider, then a default priority 
+     * of 100 will be applicable for all objects supported by this view.
+     *
+     * @method priority
+     * @memberof module:openmct.ViewProvider#
+     * @param {module:openmct.DomainObject} domainObject the domain object
+     *        to be viewed
+     * @returns {number} The priority of the view. If multiple views could apply
      *          to an object, the view that returns the lowest number will be
      *          the default view.
      */
